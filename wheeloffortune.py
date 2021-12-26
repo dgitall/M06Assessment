@@ -8,7 +8,8 @@ RSLT_ERROR = -2
 
 RSLT_ENDTURN = -10
 RSLT_SPINAGAIN = -11
-RSLT_
+RSLT_VOWELS_ONLY = -12
+RSLT_ROUNDOVER = -13
 
 WHEEL_BANKRUPT = -1
 WHEEL_BANKRUPT2 = -2
@@ -156,21 +157,36 @@ def PlayGame(PuzzleDict, PlayerList, GameSettings):
     GamePlayers = {}
     
     # Initialize the game
-    result = InitializeGame(PlayerList, GamePlayers,
+    result, GameControl, GameWheel = InitializeGame(PlayerList, GamePlayers,
                             GameWheel, GameSettings, GameControl)
 
     # Keep playing the game until it is done or there are problems
     PlayerTurn = 0
     while result == RSLT_NONE:
-        result, RoundPuzzle = SelectPuzzle(PuzzleDict)
+        result, RoundPuzzle, GameControl = SelectPuzzle(PuzzleDict, GameControl)
         
-        # Check to see if the puzzle has only vowels. If so, need to branch off to a different algorithm to finish the puzzle
-        if GameControl['VowelsOnly']:
-            result = VowelsOnly(GameWheel, GamePlayers[PlayerTurn], GameControl)        
+        # Keep playing the round until someone finishes
+        continueround = True
+        while continueround:
             
-        spinresult = SpinTheWheel(GameWheel)
-        
-        result = EvaluateSpin(spinresult, GamePlayers, GameControl)
+            # Check to see if the puzzle has only vowels. If so, need to branch off to a different algorithm to finish the puzzle
+            if GameControl['VowelsOnly']:
+                result = VowelsOnly(GameWheel, GamePlayers[PlayerTurn], GameControl, RoundPuzzle)        
+                
+            spinresult = SpinTheWheel(GameWheel)
+            if(spinresult != RSLT_ERROR):
+                result, GamePlayers[PlayerTurn], GameControl = EvaluateSpin(
+                    spinresult, GamePlayers[PlayerTurn], GameControl, RoundPuzzle)
+            else:
+                result = RSLT_ERROR
+                
+            if result == RSLT_ENDTURN:
+                # Move to the next player
+                playerturn = playerturn + 1
+                if playerturn > 2:
+                    playerturn = 0
+            elif result == RSLT_ROUNDOVER:
+                continueround = False
         
         
         pass
@@ -208,14 +224,14 @@ def InitializeGame(PlayerList, GamePlayers, GameWheel, GameSettings, GameControl
         print(fstr(globalStringRscs['ThirdPlayerBio'], locals()))
         
     # Initialize the values used to manage the games
-    GameControl = {'VowelsOnly': False, 'FinalRound': False, 'DisplayList': None}
+    GameControl = {'VowelsOnly': False, 'FinalRound': False, 'DisplayList': None, 'GuessList': None, 'VowelSolveAllowed': False}
     
     
-    return result
+    return result, GameControl, GameWheel
 
 ## Select a random choice from the list of puzzles loaded in. Pulling it out of the loaded list
 ## So that we don't pick the same puzzle again later
-def SelectPuzzle(PuzzleDict):
+def SelectPuzzle(PuzzleDict, GameControl):
     result = RSLT_ERROR
     Puzzle = {}
     
@@ -223,36 +239,51 @@ def SelectPuzzle(PuzzleDict):
     if((PuzzleDict is not None) and (len(PuzzleDict) != 0)):
         pick = random.choice(list(PuzzleDict))
         Puzzle = {'Puzzle': pick.upper(), 'Clue': PuzzleDict[pick].title()}
+        # Pop the pick out of the dictionary to avoid picking again
         PuzzleDict.pop(pick)
+        # Initialize the displaylist for this puzzles. Set to automatically show non-alpha characters at the start
+        GameControl['DisplayList'] = [False]*len(Puzzle['Puzzle'])
+        for i in range(0, len(Puzzle['Puzzle'])):
+            if(Puzzle['Puzzle'][i].isalpha() == False):
+                GameControl['DisplayList'][i] = True
+
         result = RSLT_NONE
         
-    return result, Puzzle
+    return result, Puzzle, GameControl
 
-
+## Spin the wheel by randomly picking a spot in the list. Handle the special case where there might be a million spin.
 def SpinTheWheel(GameWheel):
     result = WHEEL_BANKRUPT
     
-    # Spin the wheel by making a randomm selection
-    result = random.choice(GameWheel)
-    ## If the pick was the special bankruptcy then do another roll to see if they got the million dollar prize.
-    ## If they do get that remove it from the wheel by turning the slot into a normal bankruptcy slot. NOTE: only
-    ## Available if they change the setting to allow it. 
-    if(result == WHEEL_BANKRUPT2):
-        pick = random.randint(1,3)
-        if(pick == 1):
-            result = WHEEL_MILLION
-            GameWheel[2] = WHEEL_BANKRUPT
-        else:
-            result = WHEEL_BANKRUPT
+    # Make sure we got a valid wheel
+    if(len(GameWheel) != 0):
+        # Spin the wheel by making a randomm selection
+        result = random.choice(GameWheel)
+        ## If the pick was the special bankruptcy then do another roll to see if they got the million dollar prize.
+        ## If they do get that remove it from the wheel by turning the slot into a normal bankruptcy slot. NOTE: only
+        ## Available if they change the setting to allow it. 
+        if(result == WHEEL_BANKRUPT2):
+            pick = random.randint(1,3)
+            if(pick == 1):
+                result = WHEEL_MILLION
+                GameWheel[2] = WHEEL_BANKRUPT
+            else:
+                result = WHEEL_BANKRUPT
+    else:
+        result = RSLT_ERROR
             
     return result
 
+## Play the case where there are only vowels left. Cycle through players who guess a vowel and if it is there
+## try to solve the puzzle.
 def VowelsOnly():
     result = RSLT_NONE
     
     return result
 
-def EvaluateSpin(SpinResult, Player, GameControl):
+## Evaluate the results of the spin. Check for the special cases, otherwise pass on to a function to allow 
+## The player to take their turn
+def EvaluateSpin(SpinResult, Player, GameControl, RoundPuzzle):
     result = RSLT_NONE
     
     if(SpinResult == WHEEL_LOSETURN):
@@ -263,49 +294,118 @@ def EvaluateSpin(SpinResult, Player, GameControl):
         Player['RoundTotal'] = 0
         result = RSLT_ENDTURN
     else:
-        result = PlayNormalGuess(SpinResult, Player, GameControl)
+        result, Player, GameControl = PlayNormalGuess(
+            SpinResult, Player, GameControl, RoundPuzzle)
     
-    return result
+    return result, Player, GameControl
 
 
-def PlayNormalGuess(SpinResult, Player, GameControl):
+def PlayNormalGuess(SpinResult, Player, GameControl, RoundPuzzle):
     result = RSLT_NONE
     
+    ## If the player got the million dollar spin substitute in the dollar value. 
+    ## NOTE: This is a change to the game rules agreed upon in the class. Change later to keep the million card
+    ## stored with the player who can only redeem it if they win the final round. 
     if(SpinResult == WHEEL_MILLION):
         SpinResult = 1000000000
     print(fstr(globalStringRscs['SpinResult'], locals()))
     
-    userinput = 0
+    ## Show the menu for the player to choose how they want to play their turn
+    invalidturn = True
+    while invalidturn:
+        userinput = 0
+        invalidinput = True
+        while invalidinput:
+            userinput = input(print(globalStringRscs['PlayerTurnMenu']))
+            if userinput in ['1', '2', '3']:
+                invalidinput = False
+        
+        ## Go off to the appropriate function to handle what the player selected to do
+        if userinput == '1':
+            result, Player, GameControl = GuessConsonant(SpinResult, Player, GameControl, RoundPuzzle)
+            if result != RSLT_NONE:
+                invalidturn = False       
+        elif userinput == '2':
+            result, Player, GameControl = BuyVowel(
+                SpinResult, Player, GameControl, RoundPuzzle)
+            if result != RSLT_NONE:
+                invalidturn = False
+        else:
+            result, Player, GameControl = SolvePuzzle(
+                SpinResult, Player, GameControl, RoundPuzzle)
+            if result != RSLT_NONE:
+                invalidturn = False
+                
+    return result
+
+## The player wants to guess a consonant
+def GuessConsonant(SpinResult, Player, GameControl, RoundPuzzle):
+    result = RSLT_NONE
+    
+    print(globalStringRscs['ConsonantBanner'])
+    
+    # Get the player's guess and check that it's a consonant and hasn't already been guessed
     invalidinput = True
+    userinput = 0
     while invalidinput:
-        userinput = input(print(globalStringRscs['PlayerTurnMenu']))
-        if userinput in ['1', '2', '3']:
-            invalidinput = False
+        userinput = input(globalStringRscs['ConsonantPrompt'])
+        if userinput not in ('a', 'e', 'i', 'o', 'u'):
+            if GameControl['GuessList'] == None:
+                invalidinput = False
+            elif userinput not in GameControl['GuessList']:
+                invalidinput = False
     
-    if userinput == '1':
-        result = GuessConsonant(SpinResult, Player, GameControl)
-    elif userinput == '2':
-        result = BuyVowel(SpinResult, Player, GameControl)
+    ## Call the function to check how many times the guess is in the puzzle
+    numfound, GameControl = CheckGuess(userinput, RoundPuzzle, GameControl)
+    if numfound == 0:
+        # None of the guess found so add the incorrect guess to the guess list and return that it's the end of the turning
+        GameControl['GuessList'].append(userinput)
+        print(fstr(globalStringRscs['BadGuessMessage'], locals()))
+        result = RSLT_ENDTURN
     else:
-        result = SolvePuzzle(SpinResult, Player, GameControl)
+        guessamount = numfound * SpinResult
+        Player['RoundTotal'] += guessamount
+        print(fstr(globalStringRscs['GoodConsGuessMessasge'], locals()))
+        if VowelsOnly(RoundPuzzle, GameControl):
+            GameControl['VowelsOnly'] = True
+            result = RSLT_VOWELS_ONLY
+        else:
+            GameControl['VowelSolveAllowed'] = True
+            result = RSLT_SPINAGAIN
+        
+    return result, Player, GameControl
 
+## Count how many times the guessed character is part of the puzzle. If so, change the display list to show
+def CheckGuess(Guess, Puzzle, GameControl):
+    count = 0
     
-    return result
+    # Quick check to see if the guess is in the puzzle
+    count = Puzzle['Puzzle'].count(Guess)
+    # If it is there, we need to find all the locations to set DisplayList to allow revealing that character in the puzzle
+    if(count > 0):
+        startindex = 0
+        # Start at the left and keep finding occurrences
+        for i in range(0, count):
+            index = Puzzle['Puzzle'].find(Guess, startindex)
+            GameControl['GuessList'][index] = True
+            startindex = index + 1
+            
+    return count, GameControl
 
-
-def GuessConsonant(SpinResult, Player, GameControl):
+# Player wants to buy a vowel
+def BuyVowel(SpinResult, Player, GameControl, RoundPuzzle):
     result = RSLT_NONE
     
-    return result
-
-
-def BuyVowel(SpinResult, Player, GameControl):
-    result = RSLT_NONE
+    # Check to see if it is allowed to buy a vowel
+    if((GameControl['VowelSolveAllowed']) and Player['RoundTotal'] >= 250):
+        pass
+    else:
+        print(globalStringRscs['CantBuyVowel'])
     
     return result
 
 
-def SolvePuzzle(SpinResult, Player, GameControl):
+def SolvePuzzle(SpinResult, Player, GameControl, RoundPuzzle):
     result = RSLT_NONE
     
     return result

@@ -34,6 +34,10 @@
     "LoseTurnMessage": "<sad sound>Sorry, {Player['Player']['Name']}, you lose your turn.",
     "BankruptMessage": "<super sad sound>Sorry, {Player['Player']['Name']}, you hit bankrupt on the wheel. You will have to start over.",
     "SpinResult": "You got a spin of ${SpinResult}.",
-    "PlayerTurnMenu": "What do you want to do?\n1. Guess a consonant.\n2. Buy a vowel.\n3. Solve the puzzle."
-
+    "PlayerTurnMenu": "What do you want to do?\n1. Guess a consonant.\n2. Buy a vowel.\n3. Solve the puzzle.",
+    "ConsonantBanner": "Guess a consonant\n=====================",
+    "ConsonantPrompt": "Enter your guess: ",
+    "BadGuessMessage": "I'm sorry, {Player['Player']['Name']}, that letter isn't in the puzzle.",
+    "GoodConsGuessMessasge": "There are {numfound} of [userinput} in the puzzle. That adds {guessamount} to your total for the round.",
+    "CantBuyVowel": "Sorry....you can't buy a vowel, yet."
 }
