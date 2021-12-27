@@ -168,11 +168,17 @@ def PlayGame(PuzzleDict, PlayerList, GameSettings):
         # Keep playing the round until someone finishes
         continueround = True
         while continueround:
-            
+            result = ShowPuzzle(RoundPuzzle, GameControl)
+            print("%s: $%d    %s: $%d     %s: $%d" %
+                  (GamePlayers[0]['Player']['Name'], GamePlayers[0]['RoundTotal'],
+                   GamePlayers[1]['Player']['Name'], GamePlayers[1]['RoundTotal'],
+                   GamePlayers[2]['Player']['Name'], GamePlayers[2]['RoundTotal']))
+
             # Check to see if the puzzle has only vowels. If so, need to branch off to a different algorithm to finish the puzzle
             if GameControl['VowelsOnly']:
                 result = VowelsOnly(GameWheel, GamePlayers[PlayerTurn], GameControl, RoundPuzzle)        
                 
+            input(f"{GamePlayers[PlayerTurn]['Player']['Name']} Spin the wheel! <enter>:")
             spinresult = SpinTheWheel(GameWheel)
             if(spinresult != RSLT_ERROR):
                 result, GamePlayers[PlayerTurn], GameControl = EvaluateSpin(
@@ -182,9 +188,9 @@ def PlayGame(PuzzleDict, PlayerList, GameSettings):
                 
             if result == RSLT_ENDTURN:
                 # Move to the next player
-                playerturn = playerturn + 1
-                if playerturn > 2:
-                    playerturn = 0
+                PlayerTurn = PlayerTurn + 1
+                if PlayerTurn > 2:
+                    PlayerTurn = 0
             elif result == RSLT_ROUNDOVER:
                 continueround = False
         
@@ -251,6 +257,26 @@ def SelectPuzzle(PuzzleDict, GameControl):
         
     return result, Puzzle, GameControl
 
+## Display the puzzle, revealing the correctly guessed letter, the clue, and the list of already buessed letters
+def ShowPuzzle(RoundPuzzle, GameControl):
+    result = RSLT_NONE
+    
+    print(globalStringRscs['ShowPuzzleBanner'])
+    displayword = ''
+    for i, value in enumerate(GameControl['DisplayList']):
+        if value:
+            displayword += RoundPuzzle['Puzzle'][i] + ' '
+        else:
+            displayword += '_ '
+    print(displayword)
+    print(RoundPuzzle['Clue'])
+    if(GameControl['GuessList'] != None):
+        print(fstr(globalStringRscs['ShowGuesses'], locals()))
+        
+    print(globalStringRscs['ShowPuzzleBanner'])
+    
+    return result
+
 ## Spin the wheel by randomly picking a spot in the list. Handle the special case where there might be a million spin.
 def SpinTheWheel(GameWheel):
     result = WHEEL_BANKRUPT
@@ -294,8 +320,7 @@ def EvaluateSpin(SpinResult, Player, GameControl, RoundPuzzle):
         Player['RoundTotal'] = 0
         result = RSLT_ENDTURN
     else:
-        result, Player, GameControl = PlayNormalGuess(
-            SpinResult, Player, GameControl, RoundPuzzle)
+        result, Player, GameControl = PlayNormalGuess(SpinResult, Player, GameControl, RoundPuzzle)
     
     return result, Player, GameControl
 
@@ -336,7 +361,7 @@ def PlayNormalGuess(SpinResult, Player, GameControl, RoundPuzzle):
             if result != RSLT_NONE:
                 invalidturn = False
                 
-    return result
+    return result, Player, GameControl
 
 ## The player wants to guess a consonant
 def GuessConsonant(SpinResult, Player, GameControl, RoundPuzzle):
@@ -348,8 +373,8 @@ def GuessConsonant(SpinResult, Player, GameControl, RoundPuzzle):
     invalidinput = True
     userinput = 0
     while invalidinput:
-        userinput = input(globalStringRscs['ConsonantPrompt'])
-        if userinput not in ('a', 'e', 'i', 'o', 'u'):
+        userinput = input(globalStringRscs['ConsonantPrompt']).upper()
+        if userinput not in ('A', 'E', 'I', 'O', 'U'):
             if GameControl['GuessList'] == None:
                 invalidinput = False
             elif userinput not in GameControl['GuessList']:
@@ -358,22 +383,39 @@ def GuessConsonant(SpinResult, Player, GameControl, RoundPuzzle):
     ## Call the function to check how many times the guess is in the puzzle
     numfound, GameControl = CheckGuess(userinput, RoundPuzzle, GameControl)
     if numfound == 0:
-        # None of the guess found so add the incorrect guess to the guess list and return that it's the end of the turning
-        GameControl['GuessList'].append(userinput)
         print(fstr(globalStringRscs['BadGuessMessage'], locals()))
         result = RSLT_ENDTURN
     else:
         guessamount = numfound * SpinResult
         Player['RoundTotal'] += guessamount
-        print(fstr(globalStringRscs['GoodConsGuessMessasge'], locals()))
-        if VowelsOnly(RoundPuzzle, GameControl):
+        print(fstr(globalStringRscs['GoodConsGuessMessage'], locals()))
+        print(fstr(globalStringRscs['GoodConsGuessMessage2'], locals()))
+        if IsVowelsOnly(RoundPuzzle, GameControl):
             GameControl['VowelsOnly'] = True
-            result = RSLT_VOWELS_ONLY
+            result = RSLT_SPINAGAIN
         else:
             GameControl['VowelSolveAllowed'] = True
             result = RSLT_SPINAGAIN
+    # add the incorrect guess to the guess list and return that it's the end of the turning
+    if (GameControl['GuessList'] == None):
+        GameControl['GuessList'] = [userinput]
+    else:
+        GameControl['GuessList'].append(userinput)
         
     return result, Player, GameControl
+
+## Check to see if the remaining characters in the puzzle are all vowels or not
+def IsVowelsOnly(RoundPuzzle, GameControl):
+    result = True
+    
+    # Check all the places where DisplayList is False and see if there are any consonants left.
+    for i, value in enumerate(GameControl['DisplayList']):
+        if not value:
+            if(RoundPuzzle['Puzzle'][i] not in ('A', 'E', 'I', 'O', 'U')):
+                result = False
+                break
+    
+    return result
 
 ## Count how many times the guessed character is part of the puzzle. If so, change the display list to show
 def CheckGuess(Guess, Puzzle, GameControl):
@@ -387,7 +429,7 @@ def CheckGuess(Guess, Puzzle, GameControl):
         # Start at the left and keep finding occurrences
         for i in range(0, count):
             index = Puzzle['Puzzle'].find(Guess, startindex)
-            GameControl['GuessList'][index] = True
+            GameControl['DisplayList'][index] = True
             startindex = index + 1
             
     return count, GameControl
