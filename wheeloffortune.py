@@ -236,9 +236,7 @@ def PlayGame(PuzzleDict, PlayerList, GameSettings):
         print(fstr(globalStringRscs['EndRoundCongrats1'], locals()))
         print(fstr(globalStringRscs['EndRoundCongrats2'], locals()))
         print(fstr(globalStringRscs['EndRoundCongrats3'], locals()))
-
-        
-
+        input("Press <enter> to continue: ")
         
         if(RoundCount < 2):
             RoundCount += 1
@@ -410,10 +408,11 @@ def SelectPuzzle(PuzzleDict, GameControl):
         
     return result, Puzzle, GameControl
 
-## Display the puzzle, revealing the correctly guessed letter, the clue, and the list of already buessed letters
+## Display the puzzle, revealing the correctly guessed letters, the clue, and the list of already guessed letters
 def ShowPuzzle(RoundPuzzle, GameControl):
     result = RSLT_NONE
     
+    print("\n")
     print(globalStringRscs['ShowPuzzleBanner'])
     displayword = ''
     for i, value in enumerate(GameControl['DisplayList']):
@@ -422,7 +421,7 @@ def ShowPuzzle(RoundPuzzle, GameControl):
         else:
             displayword += '_ '
     print(displayword)
-    print(RoundPuzzle['Clue'])
+    print("Clue: " + RoundPuzzle['Clue'])
     if(GameControl['GuessList'] != None):
         print(fstr(globalStringRscs['ShowGuesses'], locals()))
         
@@ -459,6 +458,7 @@ def VowelsOnly(GamePlayers, PlayerTurn, GameControl, RoundPuzzle):
     result = RSLT_NONE
     
     print(globalStringRscs['VowelsOnlyBanner'])
+    input("Press <enter> to continue: ")
     while result != RSLT_ROUNDOVER:
         # Get the player's guess and check that it's a consonant and hasn't already been guessed
         result = ShowPuzzle(RoundPuzzle, GameControl)
@@ -484,6 +484,7 @@ def VowelsOnly(GamePlayers, PlayerTurn, GameControl, RoundPuzzle):
             if numfound == 0:
                 Player = GamePlayers[PlayerTurn]
                 print(fstr(globalStringRscs['BadGuessMessage'], locals()))
+                input("Press <enter> to continue: ")
                 result = RSLT_ENDTURN
             else:
                 print(fstr(globalStringRscs['GoodConsGuessMessage'], locals()))
@@ -513,10 +514,12 @@ def EvaluateSpin(SpinResult, Player, GameControl, RoundPuzzle):
     
     if(SpinResult == WHEEL_LOSETURN):
         print(fstr(globalStringRscs['LoseTurnMessage'], locals()))
+        input("Press <enter> to continue: ")
         result = RSLT_ENDTURN
     elif (SpinResult == WHEEL_BANKRUPT):
         print(fstr(globalStringRscs['BankruptMessage'], locals()))
         Player['RoundTotal'] = 0
+        input("Press <enter> to continue: ")
         result = RSLT_ENDTURN
     else:
         result, Player, GameControl = PlayNormalGuess(SpinResult, Player, GameControl, RoundPuzzle)
@@ -589,6 +592,7 @@ def GuessConsonant(SpinResult, Player, GameControl, RoundPuzzle):
     numfound, GameControl = CheckGuess(userinput, RoundPuzzle, GameControl)
     if numfound == 0:
         print(fstr(globalStringRscs['BadGuessMessage'], locals()))
+        input("Press <enter> to continue: ")
         result = RSLT_ENDTURN
     else:
         guessamount = numfound * SpinResult
@@ -636,6 +640,8 @@ def CheckGuess(Guess, Puzzle, GameControl):
             index = Puzzle['Puzzle'].find(Guess, startindex)
             GameControl['DisplayList'][index] = True
             startindex = index + 1
+            if(startindex >= len(GameControl['DisplayList'])):
+                startindex = len(GameControl['DisplayList'])-1
             
     return count, GameControl
 
@@ -666,6 +672,7 @@ def BuyVowel(Player, GameControl, RoundPuzzle):
         numfound, GameControl = CheckGuess(userinput, RoundPuzzle, GameControl)
         if numfound == 0:
             print(fstr(globalStringRscs['BadGuessMessage'], locals()))
+            input("Press <enter> to continue: ")
             result = RSLT_ENDTURN
         else:
             print(fstr(globalStringRscs['GoodConsGuessMessage'], locals()))
