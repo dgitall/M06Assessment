@@ -5,6 +5,6 @@
    * Wheeloffortune.py
    * phrases.json
    * stringfile.json
-   All three need to be in the same directory
+   * All three need to be in the same directory
 2. Run Wheeloffortune.py in python
  
