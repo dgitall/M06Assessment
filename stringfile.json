@@ -50,12 +50,13 @@
     "SolveBanner": "\nSolve the Puzzle\n=====================",
     "SolvePrompt": "Enter the solution: ",
     "SolveSuccessBanner": "\n$!$!$!$!$!$!$!$!$!$!$!$!$!$!$!$!$!$!$!$!$!$!",
-    "SolveSuccessMessage": "     CONGRATULATIONS, {Player['Name']}!!!  You Won The Round!",
+    "SolveSuccessMessage": "     CONGRATULATIONS, {Player['Player']['Name']}!!!  You Won The Round!",
     "CantSolvePuzzle": "Sorry....you can't solve the puzzle, yet.",
-    "SolveFailMessage": "I'm sorry, {Player['Name']}. That is not correct.",
-    "VowelsOnlyBanner": "<ding> <ding>\nThe remaining letters in the puzzle are all vowels.\nPlayers will select a vowel and if that letter is in the puzzle, they can solve the puzzle.\n We continue until the round is over.",
+    "SolveFailMessage": "I'm sorry, {Player['Player']['Name']}. That is not correct.",
+    "VowelsOnlyBanner": "\n<ding> <ding>\nThe remaining letters in the puzzle are all vowels.\nPlayers will select a vowel and if that letter is in the puzzle, they can solve the puzzle.\n We continue until the round is over.",
+    "VowelTurn": "{GamePlayers[PlayerTurn]['Player']['Name']}, it is your turn.",
     "VowelsOnlyPrompt": "Enter a Vowel: ",
-    "EndRoundCongrats1": "Congratulations to {GamePlayers[PlayerTurn]['Name']} on winning the round.",
+    "EndRoundCongrats1": "Congratulations to {GamePlayers[PlayerTurn]['Player']['Name']} on winning the round.",
     "EndRoundCongrats2": "You came away with ${GamePlayers[PlayerTurn]['RoundTotal']} in that round.",
     "EndRoundCongrats3": "That brings your total winnings to ${GamePlayers[PlayerTurn]['GameTotal']}."
 
