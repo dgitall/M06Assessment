@@ -571,7 +571,7 @@ def PlayNormalGuess(SpinResult, Player, GameControl, RoundPuzzle):
 ## The player wants to guess a consonant
 def GuessConsonant(SpinResult, Player, GameControl, RoundPuzzle):
     result = RSLT_NONE
-    
+    result = ShowPuzzle(RoundPuzzle, GameControl)
     print(globalStringRscs['ConsonantBanner'])
     
     # Get the player's guess and check that it's a consonant and hasn't already been guessed
@@ -647,6 +647,8 @@ def BuyVowel(Player, GameControl, RoundPuzzle):
     if((GameControl['VowelSolveAllowed']) and Player['RoundTotal'] >= 250):
         
         Player['RoundTotal'] -= 250
+    
+        result = ShowPuzzle(RoundPuzzle, GameControl)
         
         print(globalStringRscs['VowelBanner'])
         # Get the player's guess and check that it's a vowel and hasn't already been guessed
