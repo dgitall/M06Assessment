@@ -8,3 +8,4 @@
    * All three need to be in the same directory
 2. Run Wheeloffortune.py in python
  
+webscrapper.py written by Scott Partacz to gather the phrases and clues from https://wheeloffortuneanswer.com.
