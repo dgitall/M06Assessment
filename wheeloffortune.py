@@ -178,6 +178,12 @@ def PlayGame(PuzzleDict, PlayerList, GameSettings):
         GameControl['GuessList'] = None
         GameControl['DisplayList'] = None
         
+        #print("\n")
+        print(globalStringRscs['RoundBanner1'])
+        print(fstr(globalStringRscs['RoundBanner2'], locals()))
+        print(globalStringRscs['RoundBanner1'])
+
+        
         result, RoundPuzzle, GameControl = SelectPuzzle(PuzzleDict, GameControl)
         
         # Keep playing the round until someone finishes
@@ -188,6 +194,16 @@ def PlayGame(PuzzleDict, PlayerList, GameSettings):
                   (GamePlayers[0]['Player']['Name'], GamePlayers[0]['RoundTotal'],
                    GamePlayers[1]['Player']['Name'], GamePlayers[1]['RoundTotal'],
                    GamePlayers[2]['Player']['Name'], GamePlayers[2]['RoundTotal']))
+            print(fstr(globalStringRscs['TurnMessage'], locals()))
+            print("\n")
+            
+            # Check if all letters have been filled in and give current player a shot to solve the puzzle
+            if(sum(GameControl['DisplayList']) == len(GameControl['DisplayList'])):
+                result, GamePlayers[PlayerTurn], GameControl = SolvePuzzle(
+                    GamePlayers[PlayerTurn], GameControl, RoundPuzzle)
+                if(result == RSLT_ROUNDOVER):
+                    continueround = False
+                    break
 
             # Check to see if the puzzle has only vowels. If so, need to branch off to a different algorithm to finish the puzzle
             if GameControl['VowelsOnly']:
@@ -196,6 +212,7 @@ def PlayGame(PuzzleDict, PlayerList, GameSettings):
                 break
                 
             input(fstr(globalStringRscs['SpinTheWheel'], locals()))
+            print("\n")
             spinresult = SpinTheWheel(GameWheel)
             if(spinresult != RSLT_ERROR):
                 result, GamePlayers[PlayerTurn], GameControl = EvaluateSpin(
@@ -235,7 +252,7 @@ def PlayGame(PuzzleDict, PlayerList, GameSettings):
     if(result == RSLT_FINALROUND):
         result, GamePlayers, GameControl = PlayFinalRound(GamePlayers, GameControl, PuzzleDict)
         # If the game was completed without error, update the player stats
-        for index in range(0,2):
+        for index in range(0,3):
             GamePlayers[index]['Player']['GamesPlayed'] += 1
             GamePlayers[index]['Player']['TotalWinnings'] += GamePlayers[index]['GameTotal']
             # If the player in the final round, update their win total
@@ -255,14 +272,17 @@ def PlayFinalRound(GamePlayers, GameControl, PuzzleDict):
     # Determine which player gets to move into the final round.
     max = 0
     winner = -1
-    for index in range(0,2):
+    for index in range(0,3):
         if (GamePlayers[index]['GameTotal'] > max):
             max = GamePlayers[index]['GameTotal']
             winner = index
         elif (GamePlayers[index]['GameTotal'] == max):
-            coin = random.randint(0,1)
-            if(coin == 0):
+            if (max == -1):
                 winner = index
+            else:
+                coin = random.randint(0,1)
+                if(coin == 0):
+                    winner = index
     if winner == -1:
         result = RSLT_ERROR
     
@@ -270,7 +290,7 @@ def PlayFinalRound(GamePlayers, GameControl, PuzzleDict):
         FinalPlayer = GamePlayers[winner]
         print(f"\n\nFINAL ROUND\n")
         print(f"Congratulation, {FinalPlayer['Player']['Name']} on making it to the final round")
-        print(f"You will be playing for a cash prize of $100,000")
+        print(f"You will play for a cash prize of $100,000")
         print(f"<cheers><cheers>")
         print("You will start with the letters R-S-T-L-N-E filled in and then select three additional consonants and one vowel.")
         
@@ -283,12 +303,11 @@ def PlayFinalRound(GamePlayers, GameControl, PuzzleDict):
         result = ShowPuzzle(RoundPuzzle, GameControl)
         
         # Have the player enter 3 consonants
-
-        for i in range(0,2):
+        for i in range(0,3):
             invalidinput = True
             userinput = 0
             while invalidinput:
-                userinput = input(globalStringRscs['ConsonantPrompt']).upper()
+                userinput = input(fstr(globalStringRscs['FinalRoundConsonantPrompt'], locals())).upper()
                 if userinput not in ('A', 'E', 'I', 'O', 'U'):
                     if GameControl['GuessList'] == None:
                         invalidinput = False
@@ -300,8 +319,9 @@ def PlayFinalRound(GamePlayers, GameControl, PuzzleDict):
         invalidinput = True
         userinput = 0
         while invalidinput:
-            userinput = input(globalStringRscs['ConsonantPrompt']).upper()
-            if userinput not in ('A', 'E', 'I', 'O', 'U'):
+            userinput = input(
+                globalStringRscs['FinalRoundVowelPrompt']).upper()
+            if userinput in ('A', 'E', 'I', 'O', 'U'):
                 if GameControl['GuessList'] == None:
                     invalidinput = False
                 elif userinput not in GameControl['GuessList']:
@@ -311,33 +331,25 @@ def PlayFinalRound(GamePlayers, GameControl, PuzzleDict):
         
         result, FinalPlayer, GameControl = SolvePuzzle(FinalPlayer, GameControl, RoundPuzzle)
         if(result == RSLT_ROUNDOVER):
-            print("~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!")
-            print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-            print("                  WINNER WINNER WINNER")
-            print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-            print("~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!")
-            print("\n\n{FinalPlayer['Player']['Name']}, you have won another $100,000 in addition to your other winnings.")
+            print(globalStringRscs['FinalRoundWinnerBanner1'])
+            print(globalStringRscs['FinalRoundWinnerBanner2'])
+            print(globalStringRscs['FinalRoundWinnerBanner3'])
+            print(globalStringRscs['FinalRoundWinnerBanner2'])
+            print(globalStringRscs['FinalRoundWinnerBanner1'])
+            print("\n\n")
+            print(fstr(globalStringRscs['FinalRoundWinnerMessage1'], locals()))
             FinalPlayer['GameTotal'] += 100000
-            print(f"That brings your total winning today to ${FinalPlayer['GameTotal']}")
+            print(fstr(globalStringRscs['FinalRoundWinnerMessage2'], locals()))
         elif (result == RSLT_ENDTURN):
-            print(":( :( :( :( :( :( :( :( :( :( :( :( :( :( :( :( :( :( :( :( :( :( :( ")
-            print(":( :( :( :( :( :( :( :( :( :( :( :( :( :( :( :( :( :( :( :( :( :( :( ")
-            print("                                SORRY")
-            print(":( :( :( :( :( :( :( :( :( :( :( :( :( :( :( :( :( :( :( :( :( :( :( ")
-            print(":( :( :( :( :( :( :( :( :( :( :( :( :( :( :( :( :( :( :( :( :( :( :( ")
-
-            print(f"\n\Sorry you didn't win the final round, but you still take home ${FinalPlayer['GameTotal']} today.")
-         
-
-        
-            
-    
-    
-   
-        
-        
-    
-    return result
+            print(globalStringRscs['FinalRoundLoserBanner1'])
+            print(globalStringRscs['FinalRoundLoserBanner1'])
+            print(globalStringRscs['FinalRoundLoserBanner2'])
+            print(globalStringRscs['FinalRoundLoserBanner1'])
+            print(globalStringRscs['FinalRoundLoserBanner1'])
+            print("\n\n")
+            print(fstr(globalStringRscs['FinalRoundLoserMessage'], locals()))
+ 
+    return result, GamePlayers, GameControl
 
 
 ## Setup to play the game. Create the game wheel, create the game player data object and pick the order
@@ -450,32 +462,36 @@ def VowelsOnly(GamePlayers, PlayerTurn, GameControl, RoundPuzzle):
     while result != RSLT_ROUNDOVER:
         # Get the player's guess and check that it's a consonant and hasn't already been guessed
         result = ShowPuzzle(RoundPuzzle, GameControl)
-        print(fstr(globalStringRscs['VowelTurn'], locals()))
-        GameControl['VowelSolveAllowed'] = True
-        invalidinput = True
-        userinput = 0
-        while invalidinput:
-            userinput = input(globalStringRscs['VowelsOnlyPrompt']).upper()
-            if userinput in ('A', 'E', 'I', 'O', 'U'):
-                if GameControl['GuessList'] == None:
-                    invalidinput = False
-                elif userinput not in GameControl['GuessList']:
-                    invalidinput = False
-
-        ## Call the function to check how many times the guess is in the puzzle
-        numfound, GameControl = CheckGuess(userinput, RoundPuzzle, GameControl)
-        if numfound == 0:
-            Player = GamePlayers[PlayerTurn]
-            print(fstr(globalStringRscs['BadGuessMessage'], locals()))
-            result = RSLT_ENDTURN
-        else:
-            print(fstr(globalStringRscs['GoodConsGuessMessage'], locals()))
-            
-           # result = ShowPuzzle(RoundPuzzle, GameControl)
-            Player = GamePlayers[PlayerTurn]
+        if(sum(GameControl['DisplayList']) == len(GameControl['DisplayList'])):
+            print("\nThere are no letters remaining....")
+            print(fstr(globalStringRscs['VowelTurn'], locals()))
             result, Player, GameControl = SolvePuzzle(Player, GameControl, RoundPuzzle)
+        else:
+            print(fstr(globalStringRscs['VowelTurn'], locals()))
+            GameControl['VowelSolveAllowed'] = True
+            invalidinput = True
+            userinput = 0
+            while invalidinput:
+                userinput = input(globalStringRscs['VowelsOnlyPrompt']).upper()
+                if userinput in ('A', 'E', 'I', 'O', 'U'):
+                    if GameControl['GuessList'] == None:
+                        invalidinput = False
+                    elif userinput not in GameControl['GuessList']:
+                        invalidinput = False
 
+            ## Call the function to check how many times the guess is in the puzzle
+            numfound, GameControl = CheckGuess(userinput, RoundPuzzle, GameControl)
+            if numfound == 0:
+                Player = GamePlayers[PlayerTurn]
+                print(fstr(globalStringRscs['BadGuessMessage'], locals()))
+                result = RSLT_ENDTURN
+            else:
+                print(fstr(globalStringRscs['GoodConsGuessMessage'], locals()))
                 
+            # result = ShowPuzzle(RoundPuzzle, GameControl)
+                Player = GamePlayers[PlayerTurn]
+                result, Player, GameControl = SolvePuzzle(Player, GameControl, RoundPuzzle)
+
         if(result==RSLT_ENDTURN):
             PlayerTurn += 1
             if(PlayerTurn > 2):
@@ -659,6 +675,7 @@ def BuyVowel(Player, GameControl, RoundPuzzle):
             GameControl['GuessList'].append(userinput)
 
     else:
+        print("\n")
         print(globalStringRscs['CantBuyVowel'])
     
     return result, Player, GameControl
@@ -678,10 +695,12 @@ def SolvePuzzle(Player, GameControl, RoundPuzzle):
             if len(userinput) > 0:
                 invalidinput = False
     else:
-       print(globalStringRscs['CantSolvePuzzle'])
+        print("\n")
+        print(globalStringRscs['CantSolvePuzzle'])
        
     if(GameControl['VowelSolveAllowed']):
         if (userinput == RoundPuzzle['Puzzle']):
+            print("\n")
             print(globalStringRscs['SolveSuccessBanner'])
             print(fstr(globalStringRscs['SolveSuccessMessage'], locals()))
             print(globalStringRscs['SolveSuccessBanner'])
@@ -712,7 +731,7 @@ def MainApplication():
         if UserInput == '1':
             pass
             result, PlayerList = PlayGame(PuzzleDict, PlayerList, GameSettings)
-            if(result == RSLT_NONE):
+            if(result == RSLT_GAMEEND):
                 ShowPlayerStats(PlayerList)
         elif UserInput == '2':
             pass
