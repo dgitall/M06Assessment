@@ -311,6 +311,9 @@ def PlayFinalRound(GamePlayers, GameControl, PuzzleDict):
                         invalidinput = False
                     elif userinput not in GameControl['GuessList']:
                         invalidinput = False
+                    elif len(userinput)>0:
+                        invalidinput = False
+                         
             numfound, GameControl = CheckGuess(userinput, RoundPuzzle, GameControl)
         
         # Have the player enter 1 vowel
@@ -324,6 +327,9 @@ def PlayFinalRound(GamePlayers, GameControl, PuzzleDict):
                     invalidinput = False
                 elif userinput not in GameControl['GuessList']:
                     invalidinput = False
+                elif len(userinput)>0:
+                    invalidinput = False
+                    
         numfound, GameControl = CheckGuess(userinput, RoundPuzzle, GameControl)
         
         
