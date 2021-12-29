@@ -724,6 +724,7 @@ def SolvePuzzle(Player, GameControl, RoundPuzzle):
         result = ShowPuzzle(RoundPuzzle, GameControl)
         print(globalStringRscs['SolveBanner'])
         # Get the player's guess and check that it's not empty
+        print("Guesses must be entered exactly with all punctuation. Capitalization doesn't matter, though.")
         invalidinput = True
         while invalidinput:
             userinput = input(globalStringRscs['SolvePrompt']).upper()
