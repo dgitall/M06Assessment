@@ -248,13 +248,13 @@ def PlayGame(PuzzleDict, PlayerList, GameSettings):
     # The normal part of the game has completed
     # If this was due to normal play, continue to the final round, otherwise just exit.
     if(result == RSLT_FINALROUND):
-        result, GamePlayers, GameControl = PlayFinalRound(GamePlayers, GameControl, PuzzleDict)
+        result, GamePlayers, GameControl, finalplayer = PlayFinalRound(GamePlayers, GameControl, PuzzleDict)
         # If the game was completed without error, update the player stats
         for index in range(0,3):
             GamePlayers[index]['Player']['GamesPlayed'] += 1
             GamePlayers[index]['Player']['TotalWinnings'] += GamePlayers[index]['GameTotal']
             # If the player in the final round, update their win total
-            if(index == PlayerTurn):
+            if(index == finalplayer):
                 GamePlayers[index]['Player']['GamesWon'] += 1
         result = RSLT_GAMEEND
                 
@@ -315,6 +315,7 @@ def PlayFinalRound(GamePlayers, GameControl, PuzzleDict):
                         invalidinput = True
                          
             numfound, GameControl = CheckGuess(userinput, RoundPuzzle, GameControl)
+            GameControl['GuessList'].append(userinput)
         
         # Have the player enter 1 vowel
         invalidinput = True
@@ -352,8 +353,13 @@ def PlayFinalRound(GamePlayers, GameControl, PuzzleDict):
             print(globalStringRscs['FinalRoundLoserBanner1'])
             print("\n\n")
             print(fstr(globalStringRscs['FinalRoundLoserMessage'], locals()))
+            
+        # Show the final puzzle
+        GameControl['DisplayList'] = [True]*len(RoundPuzzle['Puzzle'])
+        result = ShowPuzzle(RoundPuzzle, GameControl)
+            
  
-    return result, GamePlayers, GameControl
+    return result, GamePlayers, GameControl, winner
 
 
 ## Setup to play the game. Create the game wheel, create the game player data object and pick the order
