@@ -102,7 +102,7 @@ def ShowPlayerStats(PlayerList):
         print(fstr(globalStringRscs['StatsGamesPlayed'], locals()))
         print(fstr(globalStringRscs['StatsGamesWon'], locals()))
         print(fstr(globalStringRscs['StatsWinnings'], locals()))
-        print('\n')
+
         
     input(globalStringRscs['StatsPrompt'])
 
@@ -311,8 +311,8 @@ def PlayFinalRound(GamePlayers, GameControl, PuzzleDict):
                         invalidinput = False
                     elif userinput not in GameControl['GuessList']:
                         invalidinput = False
-                    elif len(userinput)>0:
-                        invalidinput = False
+                    if len(userinput)==0:
+                        invalidinput = True
                          
             numfound, GameControl = CheckGuess(userinput, RoundPuzzle, GameControl)
         
@@ -327,8 +327,8 @@ def PlayFinalRound(GamePlayers, GameControl, PuzzleDict):
                     invalidinput = False
                 elif userinput not in GameControl['GuessList']:
                     invalidinput = False
-                elif len(userinput)>0:
-                    invalidinput = False
+                if len(userinput)==0:
+                    invalidinput = True
                     
         numfound, GameControl = CheckGuess(userinput, RoundPuzzle, GameControl)
         
@@ -484,6 +484,8 @@ def VowelsOnly(GamePlayers, PlayerTurn, GameControl, RoundPuzzle):
                         invalidinput = False
                     elif userinput not in GameControl['GuessList']:
                         invalidinput = False
+                    if len(userinput) == 0:
+                        invalidinput = True
 
             ## Call the function to check how many times the guess is in the puzzle
             numfound, GameControl = CheckGuess(userinput, RoundPuzzle, GameControl)
@@ -553,13 +555,18 @@ def PlayNormalGuess(SpinResult, Player, GameControl, RoundPuzzle):
     ## Show the menu for the player to choose how they want to play their turn
 
     while invalidturn:
-        userinput = 0
-        invalidinput = True
-        while invalidinput:
-            print(globalStringRscs['PlayerTurnMenu'])
-            userinput = input(globalStringRscs['PlayerTurnPrompt'])
-            if userinput in ['1', '2', '3']:
-                invalidinput = False
+        
+        ## If they can't choose a vowel or to solve, don't do the menu
+        if(GameControl['VowelSolveAllowed']):
+            userinput = 0
+            invalidinput = True
+            while invalidinput:
+                print(globalStringRscs['PlayerTurnMenu'])
+                userinput = input(globalStringRscs['PlayerTurnPrompt'])
+                if userinput in ['1', '2', '3']:
+                    invalidinput = False
+        else:
+            userinput = '1'
         
         ## Go off to the appropriate function to handle what the player selected to do
         if userinput == '1':
@@ -593,25 +600,28 @@ def GuessConsonant(SpinResult, Player, GameControl, RoundPuzzle):
                 invalidinput = False
             elif userinput not in GameControl['GuessList']:
                 invalidinput = False
+            if len(userinput)==0:
+                invalidinput = True
     
     ## Call the function to check how many times the guess is in the puzzle
     numfound, GameControl = CheckGuess(userinput, RoundPuzzle, GameControl)
     if numfound == 0:
+        print("\n")
         print(fstr(globalStringRscs['BadGuessMessage'], locals()))
         input("Press <enter> to continue: ")
         result = RSLT_ENDTURN
     else:
         guessamount = numfound * SpinResult
         Player['RoundTotal'] += guessamount
+        print("\n")
         print(fstr(globalStringRscs['GoodConsGuessMessage'], locals()))
         print(fstr(globalStringRscs['GoodConsGuessMessage2'], locals()))
         if IsVowelsOnly(RoundPuzzle, GameControl):
             GameControl['VowelsOnly'] = True
-            result = RSLT_SPINAGAIN
-        else:
-            GameControl['VowelSolveAllowed'] = True
-            result = RSLT_SPINAGAIN
-    # add the incorrect guess to the guess list and return that it's the end of the turning
+        GameControl['VowelSolveAllowed'] = True
+        result = RSLT_SPINAGAIN
+        
+    # add the guess to the guess list
     if (GameControl['GuessList'] == None):
         GameControl['GuessList'] = [userinput]
     else:
@@ -673,14 +683,18 @@ def BuyVowel(Player, GameControl, RoundPuzzle):
                     invalidinput = False
                 elif userinput not in GameControl['GuessList']:
                     invalidinput = False
+                if len(userinput)==0:
+                    invalidinput = True
                     
         ## Call the function to check how many times the guess is in the puzzle
         numfound, GameControl = CheckGuess(userinput, RoundPuzzle, GameControl)
         if numfound == 0:
+            print("\n")
             print(fstr(globalStringRscs['BadGuessMessage'], locals()))
             input("Press <enter> to continue: ")
             result = RSLT_ENDTURN
         else:
+            print("\n")
             print(fstr(globalStringRscs['GoodConsGuessMessage'], locals()))
             result = RSLT_SPINAGAIN
         # add the incorrect guess to the guess list and return that it's the end of the turning
