@@ -25,7 +25,7 @@ for y in hints:
             key = x.get_text().strip()
             dict[key] = y
             counter += 1
-        
+
 with open("phrases.json","w") as file:
     file = json.dump(dict, file)
 
