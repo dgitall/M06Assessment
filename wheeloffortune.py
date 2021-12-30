@@ -24,7 +24,7 @@ def MainApplication():
         if UserInput == '1':
             pass
             result, PlayerList = WOF_maingame.PlayGame(PuzzleDict, PlayerList, GameSettings)
-            if(result == WOF_globals.RSLT_GAMEEND):
+            if result == WOF_globals.RSLT_GAMEEND:
                 WOF_mainmenu.ShowPlayerStats(PlayerList)
         elif UserInput == '2':
             pass

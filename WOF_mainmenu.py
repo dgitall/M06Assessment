@@ -78,7 +78,7 @@ def ChangeSettings(GameSettings):
     print(WOF_globals.StringRscs['SettingsBanner'])
     # Show the list of settings to change and the current value. Repeat until they enter '0' for none
     UserInput = -1
-    while(UserInput != '0'):
+    while UserInput != '0':
         million = GameSettings['MillionCard']
         print(WOF_globals.fstr(WOF_globals.StringRscs['SettingsMenu1'],locals()))
         print(WOF_globals.StringRscs['SettingsMenu0'])
