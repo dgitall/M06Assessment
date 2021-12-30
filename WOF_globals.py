@@ -36,4 +36,3 @@ def fstr(fstring_text, locals, globals=None):
     globals = globals or {}
     ret_val = eval(f'f"{fstring_text}"', locals, globals)
     return ret_val
- 

@@ -8,15 +8,15 @@ import WOF_maingame
 ## The Main Application where everything starts and ends
 def MainApplication():
     result = WOF_globals.RSLT_NONE
-    
+
     PlayerList = list()
     PuzzleDict = dict()
     GameSettings = dict()
-    
+
     PuzzleDict, PlayerList, GameSettings = WOF_mainmenu.ApplicationStartup()
-    
+
     WOF_mainmenu.ContestantSignin(PlayerList)
-      
+
     # Get User Input and direct to the function dealing with the selection
     while result != WOF_globals.RSLT_STOP:
         print(WOF_globals.StringRscs['MainMenu'])
@@ -33,8 +33,8 @@ def MainApplication():
             result = WOF_mainmenu.ChangeSettings(GameSettings)
         elif UserInput == '5':
             result = WOF_mainmenu.ExitGame(PlayerList)
-        
-    
+
+
     return result
 
 

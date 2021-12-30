@@ -1,6 +1,6 @@
 import WOF_globals
 import json
-  
+
 ## Prepare the application and print a greeting
 def ApplicationStartup():
     PuzzleDict = {}
@@ -8,16 +8,16 @@ def ApplicationStartup():
     GameSettings = {}
     # Greeting
     print(WOF_globals.StringRscs['StartBanner'])
-    
+
     # Load the list of puzzles and clues
     with open('Data\phrases.json') as json_file:
         PuzzleDict = json.load(json_file)
-        
+
     # Create and initialize the list of players
     PlayerList = [{'Name': None, 'Bio': None, 'GamesPlayed': 0, 'GamesWon': 0, 'TotalWinnings': 0},
                   {'Name': None, 'Bio': None, 'GamesPlayed': 0, 'GamesWon': 0, 'TotalWinnings': 0},
                   {'Name': None, 'Bio': None, 'GamesPlayed': 0, 'GamesWon': 0, 'TotalWinnings': 0}]
-        
+
     # Create and Initialize the default game Settings
     GameSettings = {'MillionCard': False}
 
@@ -26,7 +26,7 @@ def ApplicationStartup():
 ## Ask the three players to register
 def ContestantSignin(PlayerList):
     result = WOF_globals.RSLT_NONE
-    
+
     print(WOF_globals.StringRscs['ContestantSignupBanner'])
     for ContestantIndex in range(0,3):
         print(WOF_globals.fstr(WOF_globals.StringRscs['ContestantBanner'], locals()))
@@ -39,7 +39,7 @@ def ContestantSignin(PlayerList):
             PlayerList[ContestantIndex]['Bio'] = None
         else:
             PlayerList[ContestantIndex]['Bio'] = bio
-        
+
     return result  
 
 
@@ -66,7 +66,7 @@ def ShowPlayerStats(PlayerList):
         print(WOF_globals.fstr(WOF_globals.StringRscs['StatsGamesWon'], locals()))
         print(WOF_globals.fstr(WOF_globals.StringRscs['StatsWinnings'], locals()))
 
-        
+
     input(WOF_globals.StringRscs['StatsPrompt'])
 
     return result   
@@ -85,15 +85,15 @@ def ChangeSettings(GameSettings):
         UserInput = input(WOF_globals.StringRscs['SettingsPrompt'])
         if UserInput == '1':
             GameSettings['MillionCard'] = not GameSettings['MillionCard']
-            
-    
+
+
     return result
 
 ## Exit Game selected from the menu. Check that the player wants to exit. If so, print
 # the contestant statistics and exit.
 def ExitGame(PlayerList):
     result = WOF_globals.RSLT_NONE
-    
+
     print('\n' + WOF_globals.StringRscs['ExitBanner'])
     # Confirm they want to quit
     UserInput = input(WOF_globals.StringRscs['ExitPrompt'])
