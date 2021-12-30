@@ -291,7 +291,7 @@ def VowelsOnly(GamePlayers, PlayerTurn, GameControl, RoundPuzzle):
                 PlayerTurn = 0
 
         # add the guess to the guess list and return that it's the end of the turn
-        if GameControl['GuessList'] == None:
+        if GameControl['GuessList'] is None:
             GameControl['GuessList'] = [userinput]
         else:
             GameControl['GuessList'].append(userinput)
@@ -419,7 +419,7 @@ def GuessConsonant(SpinResult, Player, GameControl, RoundPuzzle):
         result = WOF_globals.RSLT_SPINAGAIN
 
     # add the guess to the guess list
-    if GameControl['GuessList'] == None:
+    if GameControl['GuessList'] is None:
         GameControl['GuessList'] = [userinput]
     else:
         GameControl['GuessList'].append(userinput)
@@ -503,7 +503,7 @@ def BuyVowel(Player, GameControl, RoundPuzzle):
                 WOF_globals.StringRscs['GoodConsGuessMessage'], locals()))
             result = WOF_globals.RSLT_SPINAGAIN
         # add the incorrect guess to the guess list and return that it's the end of the turning
-        if GameControl['GuessList'] == None:
+        if GameControl['GuessList'] is None:
             GameControl['GuessList'] = [userinput]
         else:
             GameControl['GuessList'].append(userinput)
