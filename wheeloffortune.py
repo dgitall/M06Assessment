@@ -9,9 +9,9 @@ import WOF_maingame
 def MainApplication():
     result = WOF_globals.RSLT_NONE
     
-    PlayerList = list()
-    PuzzleDict = dict()
-    GameSettings = dict()
+    PlayerList = []
+    PuzzleDict = {}
+    GameSettings = {}
     
     PuzzleDict, PlayerList, GameSettings = WOF_mainmenu.ApplicationStartup()
     
