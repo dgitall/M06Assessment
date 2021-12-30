@@ -48,10 +48,10 @@ def PlayGame(PuzzleDict, PlayerList, GameSettings):
             print("\n")
 
             # Check if all letters have been filled in and give current player a shot to solve the puzzle
-            if(sum(GameControl['DisplayList']) == len(GameControl['DisplayList'])):
+            if sum(GameControl['DisplayList']) == len(GameControl['DisplayList']):
                 result, GamePlayers[PlayerTurn], GameControl = SolvePuzzle(
                     GamePlayers[PlayerTurn], GameControl, RoundPuzzle)
-                if(result == WOF_globals.RSLT_ROUNDOVER):
+                if result == WOF_globals.RSLT_ROUNDOVER:
                     continueround = False
                     break
 
@@ -66,7 +66,7 @@ def PlayGame(PuzzleDict, PlayerList, GameSettings):
                 WOF_globals.StringRscs['SpinTheWheel'], locals()))
             print("\n")
             spinresult = SpinTheWheel(GameWheel)
-            if(spinresult != WOF_globals.RSLT_ERROR):
+            if spinresult != WOF_globals.RSLT_ERROR:
                 result, GamePlayers[PlayerTurn], GameControl = EvaluateSpin(
                     spinresult, GamePlayers[PlayerTurn], GameControl, RoundPuzzle)
             else:
@@ -93,7 +93,7 @@ def PlayGame(PuzzleDict, PlayerList, GameSettings):
             WOF_globals.StringRscs['EndRoundCongrats3'], locals()))
         input("Press <enter> to continue: ")
 
-        if(RoundCount < 2):
+        if RoundCount < 2:
             RoundCount += 1
             PlayerTurn = 1
             result = WOF_globals.RSLT_NONE
@@ -102,7 +102,7 @@ def PlayGame(PuzzleDict, PlayerList, GameSettings):
 
     # The normal part of the game has completed
     # If this was due to normal play, continue to the final round, otherwise just exit.
-    if(result == WOF_globals.RSLT_FINALROUND):
+    if result == WOF_globals.RSLT_FINALROUND:
         result, GamePlayers, GameControl, finalplayer = WOF_finalround.PlayFinalRound(
             GamePlayers, GameControl, PuzzleDict)
         # If the game was completed without error, update the player stats
@@ -110,7 +110,7 @@ def PlayGame(PuzzleDict, PlayerList, GameSettings):
             GamePlayers[index]['Player']['GamesPlayed'] += 1
             GamePlayers[index]['Player']['TotalWinnings'] += GamePlayers[index]['GameTotal']
             # If the player in the final round, update their win total
-            if(index == finalplayer):
+            if index == finalplayer:
                 GamePlayers[index]['Player']['GamesWon'] += 1
         result = WOF_globals.RSLT_GAMEEND
 
@@ -126,7 +126,7 @@ def InitializeGame(PlayerList, GamePlayers, GameWheel, GameSettings, GameControl
     print(WOF_globals.StringRscs['CreateWheel'])
     GameWheel = [WOF_globals.WHEEL_BANKRUPT, WOF_globals.WHEEL_LOSETURN, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800,
                  850, 900, 100, 150, 200, 250, 300]
-    if(GameSettings['MillionCard']):
+    if GameSettings['MillionCard']:
         GameWheel[2] = WOF_globals.WHEEL_BANKRUPT2
 
     ## Initialize the game player data
@@ -176,9 +176,8 @@ def SelectPuzzle(PuzzleDict, GameControl):
         # Initialize the displaylist for this puzzles. Set to automatically show non-alpha characters at the start
         GameControl['DisplayList'] = [False]*len(Puzzle['Puzzle'])
         for i in range(0, len(Puzzle['Puzzle'])):
-            if(Puzzle['Puzzle'][i].isalpha() is False):
+            if Puzzle['Puzzle'][i].isalpha() is False:
                 GameControl['DisplayList'][i] = True
-
         result = WOF_globals.RSLT_NONE
 
     return result, Puzzle, GameControl
@@ -199,7 +198,8 @@ def ShowPuzzle(RoundPuzzle, GameControl):
             displayword += '_ '
     print(displayword)
     print("Clue: " + RoundPuzzle['Clue'])
-    if(GameControl['GuessList'] is not None):
+
+    if GameControl['GuessList'] is not None:
         print(WOF_globals.fstr(
             WOF_globals.StringRscs['ShowGuesses'], locals()))
 
@@ -214,15 +214,15 @@ def SpinTheWheel(GameWheel):
     result = WOF_globals.WHEEL_BANKRUPT
 
     # Make sure we got a valid wheel
-    if(len(GameWheel) != 0):
+    if len(GameWheel) != 0:
         # Spin the wheel by making a randomm selection
         result = random.choice(GameWheel)
         ## If the pick was the special bankruptcy then do another roll to see if they got the million dollar prize.
         ## If they do get that remove it from the wheel by turning the slot into a normal bankruptcy slot. NOTE: only
         ## Available if they change the setting to allow it.
-        if(result == WOF_globals.WHEEL_BANKRUPT2):
+        if result == WOF_globals.WHEEL_BANKRUPT2:
             pick = random.randint(1, 3)
-            if(pick == 1):
+            if pick == 1:
                 result = WOF_globals.WHEEL_MILLION
                 GameWheel[2] = WOF_globals.WHEEL_BANKRUPT
             else:
@@ -244,7 +244,7 @@ def VowelsOnly(GamePlayers, PlayerTurn, GameControl, RoundPuzzle):
     while result != WOF_globals.RSLT_ROUNDOVER:
         # Get the player's guess and check that it's a consonant and hasn't already been guessed
         result = ShowPuzzle(RoundPuzzle, GameControl)
-        if(sum(GameControl['DisplayList']) == len(GameControl['DisplayList'])):
+        if sum(GameControl['DisplayList']) == len(GameControl['DisplayList']):
             print("\nThere are no letters remaining....")
             print(WOF_globals.fstr(
                 WOF_globals.StringRscs['VowelTurn'], locals()))
@@ -285,13 +285,13 @@ def VowelsOnly(GamePlayers, PlayerTurn, GameControl, RoundPuzzle):
                 result, Player, GameControl = SolvePuzzle(
                     Player, GameControl, RoundPuzzle)
 
-        if(result == WOF_globals.RSLT_ENDTURN):
+        if result == WOF_globals.RSLT_ENDTURN:
             PlayerTurn += 1
-            if(PlayerTurn > 2):
+            if PlayerTurn > 2:
                 PlayerTurn = 0
 
         # add the guess to the guess list and return that it's the end of the turn
-        if (GameControl['GuessList'] is None):
+        if GameControl['GuessList'] is None:
             GameControl['GuessList'] = [userinput]
         else:
             GameControl['GuessList'].append(userinput)
@@ -305,12 +305,12 @@ def VowelsOnly(GamePlayers, PlayerTurn, GameControl, RoundPuzzle):
 def EvaluateSpin(SpinResult, Player, GameControl, RoundPuzzle):
     result = WOF_globals.RSLT_NONE
 
-    if(SpinResult == WOF_globals.WHEEL_LOSETURN):
+    if SpinResult == WOF_globals.WHEEL_LOSETURN:
         print(WOF_globals.fstr(
             WOF_globals.StringRscs['LoseTurnMessage'], locals()))
         input("Press <enter> to continue: ")
         result = WOF_globals.RSLT_ENDTURN
-    elif (SpinResult == WOF_globals.WHEEL_BANKRUPT):
+    elif SpinResult == WOF_globals.WHEEL_BANKRUPT:
         print(WOF_globals.fstr(
             WOF_globals.StringRscs['BankruptMessage'], locals()))
         Player['RoundTotal'] = 0
@@ -329,13 +329,13 @@ def PlayNormalGuess(SpinResult, Player, GameControl, RoundPuzzle):
     ## If the player got the million dollar spin substitute in the dollar value.
     ## NOTE: This is a change to the game rules agreed upon in the class. Change later to keep the million card
     ## stored with the player who can only redeem it if they win the final round.
-    if(SpinResult == WOF_globals.WHEEL_MILLION):
+    if SpinResult == WOF_globals.WHEEL_MILLION:
         SpinResult = 1000000000
     print(WOF_globals.fstr(WOF_globals.StringRscs['SpinResult'], locals()))
 
     invalidturn = True
     ## Check if the puzzle is all filled in and auto-jump to solve the puzzle.
-    if(sum(GameControl['DisplayList']) == len(GameControl['DisplayList'])):
+    if sum(GameControl['DisplayList']) == len(GameControl['DisplayList']):
         result, Player, GameControl = SolvePuzzle(
             Player, GameControl, RoundPuzzle)
 
@@ -346,7 +346,7 @@ def PlayNormalGuess(SpinResult, Player, GameControl, RoundPuzzle):
     while invalidturn:
 
         ## If they can't choose a vowel or to solve, don't do the menu
-        if(GameControl['VowelSolveAllowed']):
+        if GameControl['VowelSolveAllowed']:
             userinput = 0
             invalidinput = True
             while invalidinput:
@@ -419,7 +419,7 @@ def GuessConsonant(SpinResult, Player, GameControl, RoundPuzzle):
         result = WOF_globals.RSLT_SPINAGAIN
 
     # add the guess to the guess list
-    if (GameControl['GuessList'] is None):
+    if GameControl['GuessList'] is None:
         GameControl['GuessList'] = [userinput]
     else:
         GameControl['GuessList'].append(userinput)
@@ -435,7 +435,7 @@ def IsVowelsOnly(RoundPuzzle, GameControl):
     # Check all the places where DisplayList is False and see if there are any consonants left.
     for i, value in enumerate(GameControl['DisplayList']):
         if not value:
-            if(RoundPuzzle['Puzzle'][i] not in ('A', 'E', 'I', 'O', 'U')):
+            if RoundPuzzle['Puzzle'][i] not in ('A', 'E', 'I', 'O', 'U'):
                 result = False
                 break
 
@@ -450,14 +450,14 @@ def CheckGuess(Guess, Puzzle, GameControl):
     # Quick check to see if the guess is in the puzzle
     count = Puzzle['Puzzle'].count(Guess)
     # If it is there, we need to find all the locations to set DisplayList to allow revealing that character in the puzzle
-    if(count > 0):
+    if count > 0:
         startindex = 0
         # Start at the left and keep finding occurrences
         for i in range(0, count):
             index = Puzzle['Puzzle'].find(Guess, startindex)
             GameControl['DisplayList'][index] = True
             startindex = index + 1
-            if(startindex >= len(GameControl['DisplayList'])):
+            if startindex >= len(GameControl['DisplayList']):
                 startindex = len(GameControl['DisplayList'])-1
 
     return count, GameControl
@@ -503,7 +503,7 @@ def BuyVowel(Player, GameControl, RoundPuzzle):
                 WOF_globals.StringRscs['GoodConsGuessMessage'], locals()))
             result = WOF_globals.RSLT_SPINAGAIN
         # add the incorrect guess to the guess list and return that it's the end of the turning
-        if (GameControl['GuessList'] is None):
+        if GameControl['GuessList'] is None:
             GameControl['GuessList'] = [userinput]
         else:
             GameControl['GuessList'].append(userinput)
@@ -521,7 +521,7 @@ def SolvePuzzle(Player, GameControl, RoundPuzzle):
     result = WOF_globals.RSLT_NONE
 
     userinput = 0
-    if(GameControl['VowelSolveAllowed']):
+    if GameControl['VowelSolveAllowed']:
         result = ShowPuzzle(RoundPuzzle, GameControl)
         print(WOF_globals.StringRscs['SolveBanner'])
         # Get the player's guess and check that it's not empty
@@ -535,8 +535,8 @@ def SolvePuzzle(Player, GameControl, RoundPuzzle):
         print("\n")
         print(WOF_globals.StringRscs['CantSolvePuzzle'])
 
-    if(GameControl['VowelSolveAllowed']):
-        if (userinput == RoundPuzzle['Puzzle']):
+    if GameControl['VowelSolveAllowed']:
+        if userinput == RoundPuzzle['Puzzle']:
             print("\n")
             print(WOF_globals.StringRscs['SolveSuccessBanner'])
             print(WOF_globals.fstr(
