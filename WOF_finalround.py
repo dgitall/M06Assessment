@@ -14,20 +14,20 @@ def PlayFinalRound(GamePlayers, GameControl, PuzzleDict):
     max = 0
     winner = -1
     for index in range(0,3):
-        if (GamePlayers[index]['GameTotal'] > max):
+        if GamePlayers[index]['GameTotal'] > max:
             max = GamePlayers[index]['GameTotal']
             winner = index
-        elif (GamePlayers[index]['GameTotal'] == max):
-            if (max == -1):
+        elif GamePlayers[index]['GameTotal'] == max:
+            if max == -1:
                 winner = index
             else:
                 coin = random.randint(0,1)
-                if(coin == 0):
+                if coin == 0:
                     winner = index
     if winner == -1:
         result = WOF_globals.RSLT_ERROR
 
-    if(result == WOF_globals.RSLT_NONE):            
+    if result == WOF_globals.RSLT_NONE:            
         FinalPlayer = GamePlayers[winner]
         print(f"\n\nFINAL ROUND\n")
         print(f"Congratulation, {FinalPlayer['Player']['Name']} on making it to the final round")
@@ -78,7 +78,7 @@ def PlayFinalRound(GamePlayers, GameControl, PuzzleDict):
 
 
         result, FinalPlayer, GameControl = WOF_maingame.SolvePuzzle(FinalPlayer, GameControl, RoundPuzzle)
-        if(result == WOF_globals.RSLT_ROUNDOVER):
+        if result == WOF_globals.RSLT_ROUNDOVER:
             print(WOF_globals.StringRscs['FinalRoundWinnerBanner1'])
             print(WOF_globals.StringRscs['FinalRoundWinnerBanner2'])
             print(WOF_globals.StringRscs['FinalRoundWinnerBanner3'])
@@ -88,7 +88,7 @@ def PlayFinalRound(GamePlayers, GameControl, PuzzleDict):
             print(WOF_globals.fstr(WOF_globals.StringRscs['FinalRoundWinnerMessage1'], locals()))
             FinalPlayer['GameTotal'] += 100000
             print(WOF_globals.fstr(WOF_globals.StringRscs['FinalRoundWinnerMessage2'], locals()))
-        elif (result == WOF_globals.RSLT_ENDTURN):
+        elif result == WOF_globals.RSLT_ENDTURN:
             print(WOF_globals.StringRscs['FinalRoundLoserBanner1'])
             print(WOF_globals.StringRscs['FinalRoundLoserBanner1'])
             print(WOF_globals.StringRscs['FinalRoundLoserBanner2'])
