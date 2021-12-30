@@ -50,7 +50,7 @@ def PlayFinalRound(GamePlayers, GameControl, PuzzleDict):
             while invalidinput:
                 userinput = input(WOF_globals.fstr(WOF_globals.StringRscs['FinalRoundConsonantPrompt'], locals())).upper()
                 if userinput not in ('A', 'E', 'I', 'O', 'U'):
-                    if GameControl['GuessList'] == None:
+                    if GameControl['GuessList'] is None:
                         invalidinput = False
                     elif userinput not in GameControl['GuessList']:
                         invalidinput = False
@@ -67,7 +67,7 @@ def PlayFinalRound(GamePlayers, GameControl, PuzzleDict):
             userinput = input(
                 WOF_globals.StringRscs['FinalRoundVowelPrompt']).upper()
             if userinput in ('A', 'E', 'I', 'O', 'U'):
-                if GameControl['GuessList'] == None:
+                if GameControl['GuessList'] is None:
                     invalidinput = False
                 elif userinput not in GameControl['GuessList']:
                     invalidinput = False

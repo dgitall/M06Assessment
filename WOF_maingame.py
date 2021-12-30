@@ -139,17 +139,17 @@ def InitializeGame(PlayerList, GamePlayers, GameWheel, GameSettings, GameControl
     random.shuffle(GamePlayers)
     print(WOF_globals.fstr(
         WOF_globals.StringRscs['FirstPlayerOrder'], locals()))
-    if GamePlayers[0]['Player']['Bio'] != None:
+    if GamePlayers[0]['Player']['Bio'] is not None:
         print(WOF_globals.fstr(
             WOF_globals.StringRscs['FirstPlayerBio'], locals()))
     print(WOF_globals.fstr(
         WOF_globals.StringRscs['SecondPlayerOrder'], locals()))
-    if GamePlayers[1]['Player']['Bio'] != None:
+    if GamePlayers[1]['Player']['Bio'] is not None:
         print(WOF_globals.fstr(
             WOF_globals.StringRscs['SecondPlayerBio'], locals()))
     print(WOF_globals.fstr(
         WOF_globals.StringRscs['ThirdPlayerOrder'], locals()))
-    if GamePlayers[2]['Player']['Bio'] != None:
+    if GamePlayers[2]['Player']['Bio'] is not None:
         print(WOF_globals.fstr(
             WOF_globals.StringRscs['ThirdPlayerBio'], locals()))
 
@@ -176,9 +176,8 @@ def SelectPuzzle(PuzzleDict, GameControl):
         # Initialize the displaylist for this puzzles. Set to automatically show non-alpha characters at the start
         GameControl['DisplayList'] = [False]*len(Puzzle['Puzzle'])
         for i in range(0, len(Puzzle['Puzzle'])):
-            if Puzzle['Puzzle'][i].isalpha() == False:
+            if Puzzle['Puzzle'][i].isalpha() is False:
                 GameControl['DisplayList'][i] = True
-
         result = WOF_globals.RSLT_NONE
 
     return result, Puzzle, GameControl
@@ -199,7 +198,8 @@ def ShowPuzzle(RoundPuzzle, GameControl):
             displayword += '_ '
     print(displayword)
     print("Clue: " + RoundPuzzle['Clue'])
-    if GameControl['GuessList'] != None:
+
+    if GameControl['GuessList'] is not None:
         print(WOF_globals.fstr(
             WOF_globals.StringRscs['ShowGuesses'], locals()))
 
@@ -260,7 +260,7 @@ def VowelsOnly(GamePlayers, PlayerTurn, GameControl, RoundPuzzle):
                 userinput = input(
                     WOF_globals.StringRscs['VowelsOnlyPrompt']).upper()
                 if userinput in ('A', 'E', 'I', 'O', 'U'):
-                    if GameControl['GuessList'] == None:
+                    if GameControl['GuessList'] is None:
                         invalidinput = False
                     elif userinput not in GameControl['GuessList']:
                         invalidinput = False
@@ -390,7 +390,7 @@ def GuessConsonant(SpinResult, Player, GameControl, RoundPuzzle):
     while invalidinput:
         userinput = input(WOF_globals.StringRscs['ConsonantPrompt']).upper()
         if userinput not in ('A', 'E', 'I', 'O', 'U'):
-            if GameControl['GuessList'] == None:
+            if GameControl['GuessList'] is None:
                 invalidinput = False
             elif userinput not in GameControl['GuessList']:
                 invalidinput = False
@@ -482,7 +482,7 @@ def BuyVowel(Player, GameControl, RoundPuzzle):
         while invalidinput:
             userinput = input(WOF_globals.StringRscs['VowelPrompt']).upper()
             if userinput in ('A', 'E', 'I', 'O', 'U'):
-                if GameControl['GuessList'] == None:
+                if GameControl['GuessList'] is None:
                     invalidinput = False
                 elif userinput not in GameControl['GuessList']:
                     invalidinput = False
